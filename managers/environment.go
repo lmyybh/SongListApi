@@ -24,8 +24,8 @@ type Config struct {
 }
 
 type DBConfig struct {
-	URI  string `toml:"URI"`
-	Port int    `toml:"port"`
+	URI      string `toml:"URI"`
+	Database string `toml:"Database"`
 }
 
 func init() {
