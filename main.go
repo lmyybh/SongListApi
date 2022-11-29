@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"songlist/managers"
+	"songlist/routers"
 	"strconv"
 	"sync"
 
@@ -11,22 +12,20 @@ import (
 
 var log = logrus.WithField("fun", "main")
 
-func ping(w http.ResponseWriter, r *http.Request) {
-	_, _ = w.Write([]byte("Pong!"))
-}
-
 func main() {
 	//加载配置文件
 	managers.Environment()
 
 	wg := sync.WaitGroup{}
-	wg.Add(1)
-	// 初始化数据库
-	go managers.InitDatabase(&wg)
+	wg.Add(2)
+
+	go managers.InitDatabase(&wg) // 初始化数据库
+	go managers.InitRedis(&wg)    // 初始化 redis
+
 	//等待初始化完成
 	wg.Wait()
 
-	http.Handle("/ping", http.HandlerFunc(ping))
+	routers.Index()
 
 	// 开始服务
 	port := strconv.Itoa(managers.CONFIG.Port)
