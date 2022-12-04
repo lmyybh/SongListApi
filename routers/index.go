@@ -13,9 +13,15 @@ import (
 
 var indexLog = logrus.WithField("fun", "index")
 
+type ResponseData struct {
+	Message string      `json:"msg"`
+	Data    interface{} `json:"data,omitempty"`
+}
+
 func Index() {
-	user()
 	http.Handle("/ping", http.HandlerFunc(ping))
+	user()
+	songlist()
 }
 
 func ping(w http.ResponseWriter, r *http.Request) {
@@ -63,13 +69,9 @@ func verify(next http.Handler) http.Handler {
 	})
 }
 
-func response(w http.ResponseWriter, msg string) {
-	type ResponseData struct {
-		Message string `bson:"msg"`
-	}
-
+func response(w http.ResponseWriter, resData ResponseData) {
 	// 返回信息
-	if err := json.NewEncoder(w).Encode(ResponseData{Message: msg}); err != nil {
+	if err := json.NewEncoder(w).Encode(resData); err != nil {
 		indexLog.WithField("err", err).Error("Return data failed.")
 		http.Error(w, "Return data Failed.", http.StatusInternalServerError)
 		return

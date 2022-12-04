@@ -59,7 +59,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userLog.Info("The user: " + username + " is registered successfully.")
-	response(w, "ok")
+	response(w, ResponseData{Message: "ok"})
 }
 
 // POST login
@@ -77,7 +77,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	coll := managers.DB.Collection("user")
 	//取出user的密文与盐，并验证用户和密码
-	//从数据库中取出盐
 	var user models.User
 	if err := coll.FindOne(context.TODO(), bson.M{"username": username}).Decode(&user); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -103,7 +102,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userLog.Info("The user: " + username + " is logined successfully.")
-	response(w, "ok")
+	response(w, ResponseData{Message: "ok"})
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -120,5 +119,5 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userLog.Info("Logout successfully.")
-	response(w, "ok")
+	response(w, ResponseData{Message: "ok"})
 }

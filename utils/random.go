@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"math/rand"
+	"strings"
 )
 
 func RandomBytes(len int) []byte {
@@ -21,4 +22,12 @@ func RandomBytes(len int) []byte {
 // 尽量为12的倍数
 func RandomURLBase64(len int) string {
 	return base64.URLEncoding.EncodeToString(RandomBytes(len))
+}
+
+func ReadStringArray(str string) []string {
+	str = strings.ReplaceAll(str, "[", "")
+	str = strings.ReplaceAll(str, "]", "")
+	str = strings.ReplaceAll(str, " ", "")
+	str = strings.ReplaceAll(str, "\"", "")
+	return strings.Split(str, ",")
 }
