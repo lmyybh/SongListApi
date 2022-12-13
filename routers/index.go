@@ -21,7 +21,7 @@ type ResponseData struct {
 func Index() {
 	http.Handle("/ping", http.HandlerFunc(ping))
 	user()
-	songlist()
+	// playlist()
 }
 
 func ping(w http.ResponseWriter, r *http.Request) {

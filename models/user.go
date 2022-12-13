@@ -16,20 +16,10 @@ import (
 var userLog = logrus.WithField("fun", "userModel")
 
 type User struct {
-	UserName    string      `bson:"username"`
-	Salt        []byte      `bson:"salt,omitempty"`
-	Password    []byte      `bson:"password"`
-	SongLists   []SongList  `bson:"songlists,omitempty"`
-	PlayingList PlayingList `bson:"playinglist,omitempty"`
-}
-
-type SongList struct {
-	Title    string   `bson:"title"`
-	Songmids []string `bson:"songmids"`
-}
-
-type PlayingList struct {
-	Songmids []string `bson:"songmids"`
+	UserName    string   `bson:"username"`
+	Salt        []byte   `bson:"salt,omitempty"`
+	Password    []byte   `bson:"password"`
+	PlayingList []string `bson:"playinglist,omitempty"`
 }
 
 func PasswordMaker(password string, salt []byte) []byte {

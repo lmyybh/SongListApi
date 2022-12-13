@@ -3,6 +3,7 @@ package routers
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"songlist/managers"
 	"songlist/models"
@@ -17,15 +18,28 @@ var userLog = logrus.WithField("fun", "userRouter")
 const userParty = "/user"
 
 func user() {
+	http.Handle(userParty+"/checkToken", cors(verify(http.HandlerFunc(checkToken)), http.MethodGet))
 	http.Handle(userParty+"/register", cors(http.HandlerFunc(register), http.MethodPost))
 	http.Handle(userParty+"/login", cors(http.HandlerFunc(login), http.MethodPost))
 	http.Handle(userParty+"/logout", cors(http.HandlerFunc(logout), http.MethodGet))
 }
 
+func checkToken(w http.ResponseWriter, r *http.Request) {
+	response(w, ResponseData{Message: "ok"})
+}
+
 func register(w http.ResponseWriter, r *http.Request) {
+	var jsonData map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&jsonData)
+	if err != nil {
+		userLog.Error("Get params failed.")
+		http.Error(w, "Get params failed.", http.StatusBadRequest)
+		return
+	}
+
 	// 检查参数
-	username := r.PostFormValue("username")
-	password := r.PostFormValue("password")
+	username := jsonData["username"].(string)
+	password := jsonData["password"].(string)
 	if username == "" || password == "" {
 		userLog.Error("Need username and password.")
 		http.Error(w, "Need username and password.", http.StatusBadRequest)
@@ -51,7 +65,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 	// 创建用户
 	user := models.User{UserName: username}
-	_, err := models.Register(&user, password)
+	_, err = models.Register(&user, password)
 	if err != nil {
 		userLog.WithField("err", err).Error("Database error.")
 		http.Error(w, "Database error.", http.StatusInternalServerError)
@@ -67,8 +81,16 @@ func register(w http.ResponseWriter, r *http.Request) {
 // RETURN JSON{id: string, token: string, name: string, sex: enum?, face: string, desc: string}
 
 func login(w http.ResponseWriter, r *http.Request) {
-	username := r.PostFormValue("username")
-	password := r.PostFormValue("password")
+	var jsonData map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&jsonData)
+	if err != nil {
+		userLog.Error("Login failed.")
+		http.Error(w, "Login failed.", http.StatusBadRequest)
+		return
+	}
+
+	username := jsonData["username"].(string)
+	password := jsonData["password"].(string)
 	if username == "" || password == "" {
 		userLog.Error("Login failed.")
 		http.Error(w, "Login failed.", http.StatusBadRequest)
@@ -102,7 +124,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userLog.Info("The user: " + username + " is logined successfully.")
-	response(w, ResponseData{Message: "ok"})
+	response(w, ResponseData{Message: "ok", Data: username})
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
