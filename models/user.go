@@ -16,10 +16,9 @@ import (
 var userLog = logrus.WithField("fun", "userModel")
 
 type User struct {
-	UserName    string   `bson:"username"`
-	Salt        []byte   `bson:"salt,omitempty"`
-	Password    []byte   `bson:"password"`
-	PlayingList []string `bson:"playinglist,omitempty"`
+	UserName string `bson:"username"`
+	Salt     []byte `bson:"salt,omitempty"`
+	Password []byte `bson:"password"`
 }
 
 func PasswordMaker(password string, salt []byte) []byte {
@@ -47,7 +46,7 @@ func Login(w http.ResponseWriter, username string) error {
 		return err
 	}
 	//v := http.Cookie{Name: "token", Value: token, Path: "/", SameSite: 4, Secure: true}
-	v := http.Cookie{Name: "token", Value: token, Path: "/"}
+	v := http.Cookie{Name: "token", Value: token, Path: "/", Expires: time.Now().AddDate(0, 0, 1)}
 	http.SetCookie(w, &v)
 
 	return nil

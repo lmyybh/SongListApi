@@ -13,7 +13,7 @@ var Redis *redis.Client
 
 const (
 	//用户缓存生存的时间，超过这一时间用户需要重新登录
-	UserCacheLife = 1 * time.Hour
+	UserCacheLife = 24 * time.Hour
 )
 
 func InitRedis(wg *sync.WaitGroup) {
